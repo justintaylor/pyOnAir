@@ -6,7 +6,11 @@ Trigger an on air light (via GPIO) when DB flag is set
 
 
 ## work machine
+1. Sends a REST POST request to the onair machine which is hosting a FastAPI and uvicorn api
+    `https://onair.local:8000`
+  sample body: `{"new_state": true}`
 
+  - a GET to the same root path will return the current onair state
 
 
 
@@ -14,33 +18,9 @@ Trigger an on air light (via GPIO) when DB flag is set
 
 ## lights controller
 
-#### create ram drive for DB
-1. Create a new directory
-  `sudo mkdir /onair`
-2. Give all users access
-  `sudo chmod 777 /onair`
-3. Share the folder on the network
-    1. Install Samba
-      `sudo apt-get install samba -y`
-    2. Start and enable the Samba service:
-      `sudo systemctl enable --now smbd`
-    3. Open the file:
-      `sudo nano /etc/samba.smb.conf` and add the following to it, updating the path as necessary
-    ```
-    [Public]
-    path = /onair
-    browsable = yes
-    writable = yes
-    read only = no
-    force create mode = 0666
-    force directory mode = 0777
-    ``` 
-4. Save and close the file. Restart Samba with:
-  `sudo systemctl restart smbd`
-5. Add additional user for remote access:
-  `sudo adduser onair`
-6. Give the user access to the share
+#### FastAPI
+##### for testing and development
+Docker could be used if desired (FastAPI wouldn't run on my Windows machine)
 
-    `sudo smbpasswd -a onair` (will need to specify a password, can be same as user acct.)
-    
-    `sudo smbpasswd -e onair` 
+- to make the API accessible on the network the host command has to be added
+  `uvicorn main:app --reload --host 0.0.0.0`
