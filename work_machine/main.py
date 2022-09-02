@@ -3,6 +3,7 @@ import os
 import time
 
 import psutil
+import requests
 
 """
     NOT CURRENTLY IN A MEETING:
@@ -42,14 +43,12 @@ import psutil
     """
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    if __name__ == '__main__':
-        in_meeting = False
+    in_meeting = False
 
-        while True:
-
-            # TODO add time check ~between 7 am and 6 pm
+    while True:
+        if 6 <= datetime.datetime.now().hour <= 21:
 
             # TODO add day of week check?
 
@@ -61,24 +60,41 @@ if __name__ == '__main__':
                     process_id = proc.pid
                     proc_dict = proc.as_dict()
 
-                    if process_name == 'Microsoft Teams Helper (Renderer)':
+                    if process_name == "Microsoft Teams Helper (Renderer)":
                         if proc_dict.get("connections"):
-
-                            # TODO worked for meetings, but NOT call with Parry on 8-30 around 10:50 am; would thread count monitoring assist?????
-
-                            if len(proc_dict.get('connections')) >= 8 and not in_meeting:
-                                print(f'I believe you are in a call/meeting: {datetime.datetime.now().isoformat()}')
+                            if (
+                                len(proc_dict.get("connections")) >= 8
+                                and not in_meeting
+                            ):
+                                print(
+                                    f"I believe you are in a call/meeting: {datetime.datetime.now().isoformat()}"
+                                )
                                 in_meeting = True
 
-                                # TODO DB on rPi, NAS, AWS, localstack or Firebase (no python integrations)?
+                                # call the api
+                                requests.post(
+                                    "http://onair.local", json=dict(onair=True)
+                                )
 
-                            elif len(proc_dict.get('connections')) < 8 and in_meeting:
+                            elif len(proc_dict.get("connections")) < 8 and in_meeting:
                                 print(
-                                    f'I believe the call/meeting has ended: {datetime.datetime.now().isoformat()}{os.linesep}')
+                                    f"I believe the call/meeting has ended: "
+                                    f"{datetime.datetime.now().isoformat()}{os.linesep}"
+                                )
                                 in_meeting = False
 
-                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                                # call the api
+                                requests.post(
+                                    "http://onair.local", json=dict(onair=False)
+                                )
+
+                except (
+                    psutil.NoSuchProcess,
+                    psutil.AccessDenied,
+                    psutil.ZombieProcess,
+                ):
                     pass
 
             time.sleep(5)
-
+        else:
+            time.sleep(120)

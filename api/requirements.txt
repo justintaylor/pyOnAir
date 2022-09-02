@@ -1,2 +1,4 @@
+pigpio>=1.78
+gpiozero>=1.6.2
 fastapi>=0.81.0
 uvicorn>=0.18.3

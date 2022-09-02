@@ -23,3 +23,7 @@ def set_meeting_state(new_state: NewState):
     in_meeting = new_state.new_state
 
     return {"onair": in_meeting}
+
+
+def set_gpio_pin_state(state: bool, pin=5):
+    pass
