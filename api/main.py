@@ -18,7 +18,7 @@ class NewState(BaseModel):
 def read_root():
     global in_meeting
     
-    return {"onair": in_meeting, "led_state": led.value}
+    return {"onair": in_meeting, "led_state": led_pin.value}
 
 
 @app.post("/")
@@ -27,8 +27,8 @@ def set_meeting_state(new_state: NewState):
     in_meeting = new_state.new_state
 
     if in_meeting:
-        led.on()
+        led_pin.on()
     else:
-        led.off()
+        led_pin.off()
     
     return {"onair": in_meeting}
