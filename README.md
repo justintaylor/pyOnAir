@@ -12,8 +12,12 @@ Trigger an on air light (via GPIO) when DB flag is set
 
   - a GET to the same root path will return the current onair state
 
+-----
+`sudo apt install python3-rpi.gpio`
 
+https://sourceforge.net/p/raspberry-gpio-python/wiki/install/
 
+`export GPIOZERO_PIN_FACTORY=rpigpio`
 
 
 ## lights controller

@@ -10,6 +10,7 @@ led_pin = LED("GPIO21")
 
 led_pin.off()
 
+
 class NewState(BaseModel):
     new_state: bool
 
