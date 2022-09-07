@@ -72,9 +72,12 @@ if __name__ == "__main__":
                                 in_meeting = True
 
                                 # call the api
-                                requests.post(
-                                    "http://onair.local", json=dict(onair=True)
-                                )
+                                try:
+                                    requests.post(
+                                        "http://onair.local:8000", json=dict(new_state=True)
+                                    )
+                                except Exception as e:
+                                    print(e)
 
                             elif len(proc_dict.get("connections")) < 8 and in_meeting:
                                 print(
@@ -84,9 +87,12 @@ if __name__ == "__main__":
                                 in_meeting = False
 
                                 # call the api
-                                requests.post(
-                                    "http://onair.local", json=dict(onair=False)
-                                )
+                                try:
+                                    requests.post(
+                                        "http://onair.local:8000", json=dict(new_state=False)
+                                    )
+                                except Exception as e:
+                                    print(e)
 
                 except (
                     psutil.NoSuchProcess,

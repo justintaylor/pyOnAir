@@ -24,7 +24,7 @@ https://sourceforge.net/p/raspberry-gpio-python/wiki/install/
 
 #### FastAPI
 ##### for testing and development
-Docker could be used if desired (FastAPI wouldn't run on my Windows machine)
+Docker *could* be used if desired (FastAPI wouldn't run on my Windows machine)
 
 - to make the API accessible on the network the host command has to be added
   `uvicorn main:app --reload --host 0.0.0.0`
