@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.<your_username>.auto-start-pyOnAir</string>
+        <key>ServiceDescription</key>
+        <string>Auto start work machine monitoring for pyOnAir</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>zsh</string>
+            <string>-c</string>
+            <string>/Users/<your_username>/git/pyOnAir/work_machine_service/MacOS/monitor_for_meetings.sh</string>
+        </array>
+        <key>StandardOutPath</key>
+        <string>/Users/<your_username>/tmp/com.<your_username>.sync-zshrc.stdout</string>
+        <key>StandardErrorPath</key>
+        <string>/Users/<your_username>/tmp/com.<your_username>.sync-zshrc.stderr</string>
+        <key>WorkingDirectory</key>
+        <string>/Users/<your_username>/git/zshrcICSMacBookPro</string>
+        <key>KeepAlive</key>
+        <true/>
+     </dict>
+  </plist>

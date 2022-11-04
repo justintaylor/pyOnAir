@@ -47,6 +47,10 @@ if __name__ == "__main__":
 
     in_meeting = False
 
+
+    # connection count
+    connection_count = 7
+
     while True:
         if 6 <= datetime.datetime.now().hour <= 21:
 
@@ -63,11 +67,12 @@ if __name__ == "__main__":
                     if process_name == "Microsoft Teams Helper (Renderer)":
                         if proc_dict.get("connections"):
                             if (
-                                len(proc_dict.get("connections")) >= 8
+                                len(proc_dict.get("connections")) >= connection_count
                                 and not in_meeting
                             ):
                                 print(
                                     f"I believe you are in a call/meeting: {datetime.datetime.now().isoformat()}"
+                                    f"\tconnection count: {len(proc_dict.get('connections'))}"
                                 )
                                 in_meeting = True
 
@@ -79,10 +84,11 @@ if __name__ == "__main__":
                                 except Exception as e:
                                     print(e)
 
-                            elif len(proc_dict.get("connections")) < 8 and in_meeting:
+                            elif len(proc_dict.get("connections")) < connection_count and in_meeting:
                                 print(
                                     f"I believe the call/meeting has ended: "
                                     f"{datetime.datetime.now().isoformat()}{os.linesep}"
+                                    f"\tconnection count: {len(proc_dict.get('connections'))}"
                                 )
                                 in_meeting = False
 
