@@ -1,3 +1,5 @@
+import subprocess
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from gpiozero import LED
@@ -33,3 +35,8 @@ def set_meeting_state(new_state: NewState):
         led_pin.off()
     
     return {"onair": in_meeting}
+
+
+@app.post("/shutdown")
+def shutdown():
+    print(subprocess.run('shutdown --poweroff now', shell=True, capture_output=True))

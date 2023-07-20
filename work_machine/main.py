@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import time
 
@@ -43,62 +44,83 @@ import requests
     """
 
 
+def change_lights_state(enable):
+    new_state = 'on' if enable else 'off'
+    try:
+        requests.get(
+            "http://192.168.0.173/light/" + new_state
+        )
+    except Exception as e:
+        print(e)
+
+
 if __name__ == "__main__":
 
     in_meeting = False
 
-
     # connection count
-    connection_count = 7
+    # TODO move to a config file/command line params
+    CONNECTION_COUNT = 7
+    CONNECTION_COUNT_MAX = 15  # more than this isn't a meeting, but something else
 
     while True:
         if 6 <= datetime.datetime.now().hour <= 21:
 
             # TODO add day of week check?
 
+
+
+            # TODO Apple notification if service is unreachable???
+
+
+
             # Iterate over all running process
-            for proc in psutil.process_iter():
+            for proc in psutil.process_iter(['name', 'pid', 'connections']):
+            # for proc in psutil.process_iter():
                 try:
                     # Get process name & pid from process object.
-                    process_name = proc.name()
-                    process_id = proc.pid
-                    proc_dict = proc.as_dict()
+                    proc_dict = proc.info
+                    process_name = proc_dict.get('name')
+                    process_id = proc_dict.get('pid')
+                    # process_name = proc.name()
+                    # process_id = proc.pid
+                    # proc_dict = proc.as_dict()
 
-                    if process_name == "Microsoft Teams Helper (Renderer)":
-                        if proc_dict.get("connections"):
-                            if (
-                                len(proc_dict.get("connections")) >= connection_count
-                                and not in_meeting
-                            ):
-                                print(
-                                    f"I believe you are in a call/meeting: {datetime.datetime.now().isoformat()}"
-                                    f"\tconnection count: {len(proc_dict.get('connections'))}"
-                                )
-                                in_meeting = True
-
-                                # call the api
-                                try:
-                                    requests.post(
-                                        "http://onair.local:8000", json=dict(new_state=True)
+                    match process_name:
+                        case "Microsoft Teams Helper (Renderer)":
+                            if proc_dict.get("connections"):
+                                if (
+                                    CONNECTION_COUNT <= len(proc_dict.get("connections")) < CONNECTION_COUNT_MAX
+                                        and not in_meeting
+                                ):
+                                    print(
+                                        f"I believe you are in a call/meeting: {datetime.datetime.now().isoformat()}"
+                                        f"\tconnection count: {len(proc_dict.get('connections'))}"
+                                        f"\t{json.dumps(proc_dict['connections'])}"
                                     )
-                                except Exception as e:
-                                    print(e)
+                                    in_meeting = True
 
-                            elif len(proc_dict.get("connections")) < connection_count and in_meeting:
-                                print(
-                                    f"I believe the call/meeting has ended: "
-                                    f"{datetime.datetime.now().isoformat()}{os.linesep}"
-                                    f"\tconnection count: {len(proc_dict.get('connections'))}"
-                                )
-                                in_meeting = False
+                                    # call the api
+                                    change_lights_state(enable=True)
 
-                                # call the api
-                                try:
-                                    requests.post(
-                                        "http://onair.local:8000", json=dict(new_state=False)
+                                elif len(proc_dict.get("connections")) < CONNECTION_COUNT and in_meeting:
+                                    print(
+                                        f"I believe the call/meeting has ended: "
+                                        f"{datetime.datetime.now().isoformat()}{os.linesep}"
+                                        f"\tconnection count: {len(proc_dict.get('connections'))}"
                                     )
-                                except Exception as e:
-                                    print(e)
+                                    in_meeting = False
+
+                                    # call the api
+                                    change_lights_state(enable=False)
+
+                                else:
+                                    print('\r', f'Connections: {len(proc_dict.get("connections"))}', flush=True, sep='', end='')
+
+                        case "zoom.us":
+                            change_lights_state(enable=True)
+
+                        # TODO save off last state so it can be turned off later
 
                 except (
                     psutil.NoSuchProcess,
